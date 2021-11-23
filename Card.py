@@ -1,7 +1,8 @@
 class Card(object):
     """
     This class describes the Card object. Holds a Card's suit and value. 
-    Card's value ranges from 2 to 14, with 2-10 being the standard numerical representations. and 11-14 being the face Cards (Jack, Queen, King, Ace).
+    Card's value ranges from 2 to 14, with 2-10 being the standard numerical 
+    representations. And 11-14 being the face Cards (Jack, Queen, King, Ace).
     """
     def __init__(self, suit, value) -> None:
         self.suit = suit
@@ -9,7 +10,7 @@ class Card(object):
 
     def show(self) -> None:
         """
-        Getter method to display card suit and value, also converts values above
+        Getter method to display card suit and value, also converts values above 
         10 to appropriate Face card name (i.e. Jack, Queen, King, Ace)
         """
         if self.val == 11:
