@@ -21,6 +21,17 @@ Assumption 1:
 Assumption 2:
   - when in "War" scenario, if one player runs out of cards without the War scenario terminating, then they automatically forfeit the War scenario and lose the game
 
+Assumption 3:
+  - If all other players have no cards, the remaining player wins automatically.
+
+Assumption 4:
+  - When dealing, if deck is not divisible by the number of players, then the remaining "extra" cards are dealt out circularly in order. 
+  
+Definitions of terms:
+  - "Tie": when all the played cards in a Turn are of equal value. In this scenario, the cards remain on the table and the turn resets to determine the Round winner.
+  - "Turn": In a turn, each player only plays one card to the table. If their card is of greater value than the prior cards already in turnCards, then they're called the "roundWinner"
+  - "Round": can consist of multiple turns, depending on if there was a Tie scenario or not. The round is finished when one player's played card is higher than the rest of the cards played in that Turn. After this, that player takes all the cards on the table.
+
 """
 
 from Card import Card
@@ -108,13 +119,13 @@ class Game(object):
       played_card = p.playCard()
       
       if not played_card:
-          # if p has no more cards to play, then remove from players, edge case, may not be used
-          print("\n  Player {} is out of cards and has LOST!\n".format(p.name))
-          self.players.remove(p)
-          self.losers.append(p)
-          if self.num_players - len(self.losers) == 1:
-            self.winner = self.players.pop()
-            self.endGameMessage()
+        # if p has no more cards to play, then remove from players, edge case, may not be used
+        print("\n  Player {} is out of cards and has LOST!\n".format(p.name))
+        self.players.remove(p)
+        self.losers.append(p)
+        if self.num_players - len(self.losers) == 1:
+          self.winner = self.players.pop()
+          self.endGameMessage()
             
       else: # p plays the card
         print("  Player {} plays ".format(p.name) + played_card.show())
