@@ -21,13 +21,17 @@ class Player(object):
         # returns number of cards in the Player's hand
         return len(self.hand)
 
-    def collectCards(self, cards:list) -> None:
+    def collectCards(self, cards:list, reverse=True) -> None:
         """
         Takes list of Cards to be collected and adds it to the end of the Player's hand.
         Small assumption: since order of cards being added to hand is fixed, it's in spirit of War game mechanics.
-        the first card added to the end of the hand is the "first" card to have been played in the list/pile.
+        the last card added to the end of the hand is the "first" card to have been played in the list/pile.
+        - Gives option of simply concatenating it to the end, this is used for initial collection from deck
         """
-        self.hand = self.hand + cards
+        if reverse:
+            self.hand = self.hand + cards[::-1]
+        else:
+            self.hand = self.hand + cards
     
     def playCard(self) -> Union[Card, bool]:
         """

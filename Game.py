@@ -38,6 +38,7 @@ class Game(object):
   The run() method drives the Game interaction and calls upon playTurn() to play each turn, determining which Player wins the turn and gets the tableCards. checkWin() is used in run() to check if a Player has won the Game, at which point the endGameMessage() stats are displayed.
   """
   def __init__(self, num_players:int = 2) -> None:
+      self.num_players = num_players
       self.players = [Player(i) for i in range(num_players)] # initialize each Player with idx+1 as name
       self.rounds = 0
       self.tableCards = []     # all the cards that are on the table, to be collected by a Player
@@ -55,6 +56,7 @@ class Game(object):
   def endGameMessage(self) -> None:
     """
     Prints the end game message with stats such as number of turns played, which Player won, which Player(s) lost.
+    Then exits with code 0. Exiting here prevents edge cases from manifesting in nasty bugs (infinite loops)
     """
     # ensure winner is actually a Player
     if self.winner:
@@ -67,12 +69,16 @@ class Game(object):
     # for player in self.losers:
     #   print("    Player {}".format(player.name))
     print("  Total number of rounds played: {}\n".format(self.rounds))
+    exit(0)  # need to terminate game here to prevent edge cases
 
   def checkWin(self) -> bool:
     """
     Checks each Player's hand count to see if they have won (52 cards in their hand). If win, set
     self.winner to the Player and return true, else return false.
     """
+    if len(self.players) == 1:
+      self.winner = self.players.pop()
+      return True
     for p in self.players:
       if p.handCount() >= self.deckSize:
         self.winner = p
@@ -89,7 +95,7 @@ class Game(object):
     print("Created deck and splitting it amongst {} players...".format(len(self.players)))
     splitDeck = deck.splitDeck(len(self.players))
     for idx in range(len(self.players)):
-      self.players[idx].collectCards(splitDeck[idx])
+      self.players[idx].collectCards(splitDeck[idx], reverse=False)
       print("Player {} now has {} cards.".format(self.players[idx].name, str(self.players[idx].handCount())))
     print("\n")
 
@@ -100,13 +106,18 @@ class Game(object):
     turnCards = []      # the set of cards played in a "turn" (ignores any previous cards that may be on table)
     for p in self.players: # players still in the game (losers have been removed and put in self.losers)
       played_card = p.playCard()
+      
       if not played_card:
           # if p has no more cards to play, then remove from players, edge case, may not be used
-          print("PLAYER {} HAS LOST!!!!!\n".format(p.name))
+          print("\n  Player {} is out of cards and has LOST!\n".format(p.name))
           self.players.remove(p)
-          self.losers = self.losers + p
+          self.losers.append(p)
+          if self.num_players - len(self.losers) == 1:
+            self.winner = self.players.pop()
+            self.endGameMessage()
+            
       else: # p plays the card
-        print("Player {} plays ".format(p.name) + played_card.show())
+        print("  Player {} plays ".format(p.name) + played_card.show())
         # check to see if played_card beats other cards on turnCards
         maxVal = 0  
         # find the maxVal in turnCards
@@ -114,12 +125,13 @@ class Game(object):
           for tCard in turnCards:
             if maxVal < tCard.val:
               maxVal = tCard.val
+        
         turnCards.append(played_card)
         # by here maxVal = 0 (meaning no prev card played) or is the max card val played
         if maxVal < played_card.val:
           self.roundWinner = p
     #end of turn checks
-    if len(self.players) > 1:
+    if len(self.players) > 1 and turnCards:
       # more than one player left, check for ties
       firstCardVal = turnCards[0].val
       for tCard in turnCards:
@@ -132,7 +144,6 @@ class Game(object):
       return (False, turnCards)
     else:
       return (self.roundWinner, turnCards)
-    # return (self.roundWinner, turnCards) if not self.tie else (None, turnCards)
 
   def play(self, round_limit:int = math.inf, custom_test:bool = False, p1cards:list = None, p2cards:list = None) -> None:
     """
@@ -146,8 +157,8 @@ class Game(object):
     # check if there's a custom_test flag set, indicating want to have custom player hands    
     if custom_test:  
       print("Dealing custom test cards")
-      self.players[0].collectCards(p1cards)
-      self.players[1].collectCards(p2cards)
+      self.players[0].collectCards(p1cards, reverse=False)
+      self.players[1].collectCards(p2cards, reverse=False)
       self.deckSize = len(p1cards) + len(p2cards)
 
       print("Player 0 has {} cards and starts with:".format(str(self.players[0].handCount())))
@@ -162,19 +173,26 @@ class Game(object):
 
     # checkWin() used to check if there is a winner, if no winner, then play another round
     while not self.checkWin() and self.rounds < round_limit: 
-      print("New turn beginning... \n")
+      self.rounds += 1
+
+      print("Beginning of Round {}".format(self.rounds))
+      for p in self.players:
+        print("  Player {} has {} cards".format(p.name, p.handCount()))
+      print("\n  Playing cards... \n")
+      
       rWinner, turnCards = self.playTurn()
-      self.tableCards = self.tableCards + turnCards
-      while not rWinner:
+      self.tableCards = self.tableCards + turnCards  # add cards from turn to tableCards
+      while self.tie or (not rWinner):
         print("\tTie has occurred, War!")
-        print("\nKeep playing... \n")
+        # for p in self.players:
+        #   print("  Player {} has {} cards".format(p.name, p.handCount()))
+        print("\n\tKeep playing... \n")
         rWinner, turnCards = self.playTurn()
         self.tableCards = self.tableCards + turnCards
       # give the roundWinner the tableCards
-      self.rounds += 1
-      rWinner.collectCards(self.tableCards)
-      print("Round {} winner is {}".format(self.rounds, rWinner.name))
-      print("They collect the cards on the table and now have {} cards in their hand.".format(rWinner.handCount()))
+      rWinner.collectCards(self.tableCards) 
+      print("\n  Round {} winner is Player {}".format(self.rounds, rWinner.name))
+      print("  They collect the cards on the table and now have {} cards in their hand.\n\n".format(rWinner.handCount()))
       # reset 
       self.tableCards = []
       self.tie = False
@@ -186,11 +204,26 @@ class Game(object):
 
 ## driver code, tests
 
-g = Game()
+g = Game(num_players=2)
 
+# TEST CASE 1: testing that game properly handles War tie scenario, and properly terminates at end
 # p1cards = [Card("Clubs", 14), Card("Hearts", 14), Card("Spades", 14), Card("Diamonds", 14), Card("Clubs", 13), Card("Hearts", 13)]
 # p2cards = [Card("Clubs", 14), Card("Hearts", 14), Card("Spades", 14), Card("Diamonds", 14), Card("Clubs", 13), Card("Hearts", 3)]
 
-#g.play(custom_test=True, p1cards=p1cards, p2cards=p2cards)
+# TEST CASE 2: testing that game properly handles when one player runs out of cards during a Tie. Expected that they should lose immediately
+# p1cards = [Card("Clubs", 14), Card("Hearts", 14), Card("Spades", 14), Card("Diamonds", 14), Card("Clubs", 13), Card("Hearts", 13)]
+# p2cards = [Card("Clubs", 14), Card("Hearts", 14), Card("Spades", 14), Card("Diamonds", 14), Card("Clubs", 13)]
 
-g.play(round_limit=10, custom_test=False)
+# TEST CASE 3: testing that game properly handles when one player has more cards than the other 
+# where p1 expected to win, after a few rounds.
+# should also show that the Player's hand doesn't just wrap back to original starting card, instead we want to emulate
+# real-life picking up of "stack" of cards from table, where the most recently placed card is placed top into our hand.
+# this prevents circular repetition of hands, and deadlock scenarios
+# p1cards = [Card("Clubs", 14), Card("Hearts", 14), Card("Spades", 14), Card("Diamonds", 14), Card("Clubs", 13), Card("Hearts", 13)]
+# p2cards = [Card("Clubs", 14), Card("Hearts", 14), Card("Spades", 14), Card("Diamonds", 14), Card("Clubs", 13), Card("Hearts", 2), Card("Hearts", 3)]
+
+# custom run case
+# g.play(custom_test=True, p1cards=p1cards, p2cards=p2cards)
+
+# default run case
+g.play(custom_test=False)
