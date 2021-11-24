@@ -1,5 +1,6 @@
 from Card import Card
 from random import randint
+from typing import Union
 
 class Deck(object):
     """
@@ -37,7 +38,7 @@ class Deck(object):
             self.card_list[idx], self.card_list[randIdx] = self.card_list[randIdx], self.card_list[idx]
         return self.card_list
 
-    def drawSingle(self) -> Card:
+    def drawSingle(self) -> Union[Card, bool]:
         """
         Pops top card off of the deck, and gives it to caller. This method can also be useful if there's custom rules regarding deck in the future. If empty deck, then return False.
         """
