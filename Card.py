@@ -8,7 +8,7 @@ class Card(object):
         self.suit = suit
         self.val = value
 
-    def show(self) -> None:
+    def show(self) -> str:
         """
         Getter method to display card suit and value, also converts values above 
         10 to appropriate Face card name (i.e. Jack, Queen, King, Ace)
@@ -23,10 +23,10 @@ class Card(object):
             card_val = "Ace"    
         else:
             card_val = self.val
-        print("{} of {}".format(card_val, self.suit))
+        return "{} of {}".format(card_val, self.suit)
 
 
 # Testing Driver code
 
 # card = Card("Hearts", 12) # queen of hearts
-# card.show()
+# print(card.show())

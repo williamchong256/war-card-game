@@ -17,7 +17,7 @@ class Deck(object):
         Builds a standard deck with 52 cards. 4 Suits (Clubs, Hearts, Diamonds, Spades). 
         There are four Cards for each Value, one of each Suit. 
         """
-        for val in range(2,15):
+        for val in range(2,5):
             for suit in ["Clubs", "Hearts", "Diamonds", "Spades"]:
                 # create the respective Card object and add it to the list
                 self.card_list.append(Card(suit, val))
@@ -67,8 +67,16 @@ class Deck(object):
 ########################################################################################################################
 
 #  # driver code
-deck = Deck()
-c = []
+# deck = Deck()
+# c = []
+
+
+# wrap = deck.splitDeck(2)
+# print(len(wrap[0]))
+
+# print(len(wrap[1]))
+
+
 
 # checking the shuffling
 # shuffled_cards = deck.shuffle()
@@ -77,12 +85,12 @@ c = []
 
 # # checking if its split properly
 # count = 0
-# total = deck.splitDeck(15)
-# for i in range(15):
+# total = deck.splitDeck(2)
+# for i in range(2):
 #     print()
 #     for card in total[i]:
 #         count += 1
-#         card.show()
+#         print(card.show())
 #     print("count: " + str(count))
 #     print()
 

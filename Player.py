@@ -14,7 +14,7 @@ class Player(object):
     def displayHand(self) -> None:
         print("{}'s hand: ".format(self.name))
         for card in self.hand:
-            card.show()
+            print(card.show())
 
     def handCount(self) -> int:
         # returns number of cards in the Player's hand
@@ -26,8 +26,7 @@ class Player(object):
         Small assumption: since order of cards being added to hand is fixed, it's in spirit of War game mechanics.
         the first card added to the end of the hand is the "first" card to have been played in the list/pile.
         """
-        for card in cards:
-            self.hand.append(card)
+        self.hand = self.hand + cards
     
     def playCard(self) -> Union[Card, bool]:
         """
