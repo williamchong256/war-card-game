@@ -4,6 +4,10 @@ This project implements the card game War as detailed [here](https://en.wikipedi
 
 There are four modules implemented here: Game.py, Card.py, Deck.py, and Player.py. Each module implements a separate class object for clarity and modularity. 
 
+## How to Use:
+Game.py contains sample driving code, so running "python3 Game.py" should give a good demo. 
+You can also add test cases and run them from within Game.py, several sample usages are given at the end of the Game module.
+
 ## General structure:
   - Game class: The top level class which controls the game mechanics and has Player and Deck objects; checks for game end conditions, which Player gets the Cards, handles display of game state. Also allows for custom dealing setups, limiting the number of rounds played. Terminates after endGame condition is met.
   - Card object that holds card information and displays it: suit and rank
