@@ -12,9 +12,10 @@ class Player(object):
         self.hand = hand # list of cards fed in, defaults to empty hand
 
     def displayHand(self) -> None:
-        print("{}'s hand: ".format(self.name))
+        print("Player {}'s hand: ".format(self.name))
         for card in self.hand:
-            print(card.show())
+            if card:
+                print(card.show())
 
     def handCount(self) -> int:
         # returns number of cards in the Player's hand

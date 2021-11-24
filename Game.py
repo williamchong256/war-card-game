@@ -27,6 +27,7 @@ from Card import Card
 from Deck import Deck
 from Player import Player
 from typing import Union
+import math
 
 
 # construct the Game class
@@ -105,7 +106,7 @@ class Game(object):
           self.players.remove(p)
           self.losers = self.losers + p
       else: # p plays the card
-        print("Player {} plays " + played_card.show())
+        print("Player {} plays ".format(p.name) + played_card.show())
         # check to see if played_card beats other cards on turnCards
         maxVal = 0  
         # find the maxVal in turnCards
@@ -133,33 +134,40 @@ class Game(object):
       return (self.roundWinner, turnCards)
     # return (self.roundWinner, turnCards) if not self.tie else (None, turnCards)
 
-  def play(self) -> None:
+  def play(self, round_limit:int = math.inf, custom_test:bool = False, p1cards:list = None, p2cards:list = None) -> None:
     """
     Main game loop that drives the game, prompts turns/plays, and determines if a player has won.
+    Input parameters: 
+    - round_limit: number of rounds to play, defaults to inf 
+    - custom_test: boolean flag to determine if there are custom hand inputs
+    - p1cards and p2cards: list of Cards, the custom hand inputs for p1 and p2
     """
 
-    
-    p1cards = [Card("Clubs", 14), Card("Hearts", 14), Card("Spades", 14), Card("Diamonds", 14), Card("Clubs", 13), Card("Hearts", 13)]
-    p2cards = [Card("Clubs", 14), Card("Hearts", 14), Card("Spades", 14), Card("Diamonds", 14), Card("Clubs", 13), Card("Hearts", 3)]
+    # check if there's a custom_test flag set, indicating want to have custom player hands    
+    if custom_test:  
+      print("Dealing custom test cards")
+      self.players[0].collectCards(p1cards)
+      self.players[1].collectCards(p2cards)
+      self.deckSize = len(p1cards) + len(p2cards)
 
-    self.players[0].collectCards(p1cards)
-    self.players[1].collectCards(p2cards)
-
-    #print(self.players[0].displayHand())
-    #print(self.players[1].displayHand())
-    # print("Player {} now has {} cards.".format(self.players[0].name, str(self.players[0].handCount())))
-    # print("Player {} now has {} cards.".format(self.players[1].name, str(self.players[1].handCount())))
-
-
+      print("Player 0 has {} cards and starts with:".format(str(self.players[0].handCount())))
+      print(self.players[0].displayHand())
+      print("\n\n")
+      print("Player 1 has {} cards and starts with:".format(str(self.players[1].handCount())))
+      print(self.players[1].displayHand())
+      print("")
+      print("\n\n")
+    else:
+      self.dealCards()
 
     # checkWin() used to check if there is a winner, if no winner, then play another round
-    while not self.checkWin() and self.rounds < 10: 
+    while not self.checkWin() and self.rounds < round_limit: 
       print("New turn beginning... \n")
       rWinner, turnCards = self.playTurn()
       self.tableCards = self.tableCards + turnCards
       while not rWinner:
         print("\tTie has occurred, War!")
-        print("\tNew turn beginning... \n")
+        print("\nKeep playing... \n")
         rWinner, turnCards = self.playTurn()
         self.tableCards = self.tableCards + turnCards
       # give the roundWinner the tableCards
@@ -175,49 +183,14 @@ class Game(object):
     self.endGameMessage()
         
 
+
+## driver code, tests
+
 g = Game()
-g.dealCards()
-g.play()
 
-# deck = Deck()
-# count = 0
-# total = deck.splitDeck(2)
-# # for i in range(2):
-# #     print()
-# #     for card in total[i]:
-# #         count += 1
-# #         print(card.show())
-# #     print("count: " + str(count))
-# #     print()
+# p1cards = [Card("Clubs", 14), Card("Hearts", 14), Card("Spades", 14), Card("Diamonds", 14), Card("Clubs", 13), Card("Hearts", 13)]
+# p2cards = [Card("Clubs", 14), Card("Hearts", 14), Card("Spades", 14), Card("Diamonds", 14), Card("Clubs", 13), Card("Hearts", 3)]
 
-# p1 = Player(str(1))
-# p2 = Player(str(2))
-# print(p1.handCount())
-# print(p2.handCount())
+#g.play(custom_test=True, p1cards=p1cards, p2cards=p2cards)
 
-
-# # for item in total[0]:
-# #   print(item.show())
-# #   p1.hand.append(item)
-# #   print("hand count {}".format(p1.handCount()))
-# p1.collectCards(total[0])
-
-# print("\n\n\n")
-# # for item in total[1]:
-# #   print(item.show())
-# #   p2.hand.append(item)
-# #   print("hand count {}".format(p2.handCount()))
-# p2.collectCards(total[1])
-
-# # p1.collectCards(total[0])
-# # p2.collectCards(total[1])
-
-# print(p1.handCount())
-# p1.displayHand()
-# print("\n\n\n")
-
-
-# print(p2.handCount())
-# p2.displayHand()
-
-# g.endGameMessage()
+g.play(round_limit=10, custom_test=False)

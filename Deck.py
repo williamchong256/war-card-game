@@ -17,7 +17,7 @@ class Deck(object):
         Builds a standard deck with 52 cards. 4 Suits (Clubs, Hearts, Diamonds, Spades). 
         There are four Cards for each Value, one of each Suit. 
         """
-        for val in range(2,5):
+        for val in range(2,15):
             for suit in ["Clubs", "Hearts", "Diamonds", "Spades"]:
                 # create the respective Card object and add it to the list
                 self.card_list.append(Card(suit, val))
